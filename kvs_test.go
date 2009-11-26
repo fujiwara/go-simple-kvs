@@ -57,9 +57,7 @@ func TestServerStandalone (t *testing.T) {
 }
 
 func TestServerClient (t *testing.T) {
-	go func() {
-		RunServer("localhost:1975");
-	}();
+	go RunServer("localhost:1975");
 
 	client, err := NewClient("localhost:1975");
 	ok(t, err == nil, "NewClient()");
@@ -68,7 +66,6 @@ func TestServerClient (t *testing.T) {
 	value, err = client.Get("xxx");
 	ok(t, err == nil, "");
 	ok(t, value == "", "client.Get(xxx) == \"\"");
-	fmt.Printf("%s", "A");
 
 	for i := 0; i < 10; i++ {
 		key := fmt.Sprintf("key_%d", i);
