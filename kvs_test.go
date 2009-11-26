@@ -3,6 +3,7 @@ package kvs
 import (
 	"testing";
 	"fmt";
+	"time";
 )
 var tested int = 1;
 
@@ -58,6 +59,8 @@ func TestServerStandalone (t *testing.T) {
 
 func TestServerClient (t *testing.T) {
 	go RunServer("localhost:1975");
+
+	time.Sleep(int64(1) * 1e8); // wait for Server started
 
 	client, err := NewClient("localhost:1975");
 	ok(t, err == nil, "NewClient()");
