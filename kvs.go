@@ -49,3 +49,31 @@ func (self *Server) Set(args *Args, reply *Reply) os.Error {
 	reply.Value = "ok";
 	return nil;
 }
+
+type Client struct {
+	client *rpc.Client;
+}
+
+func NewClient(addr string) (*Client, os.Error) {
+	self := new(Client);
+	client, err := rpc.DialHTTP("tcp", addr);
+	self.client = client;
+	return self, err;
+}
+
+func (c *Client) Get(key string) (string, os.Error) {
+	reply := new(Reply);
+	args  := new(Args);
+	args.Key = key;
+	err := c.client.Call("Server.Get", args, reply);
+	return reply.Value, err;
+}
+
+func (c *Client) Set(key string, value string) (string, os.Error) {
+	reply := new(Reply);
+	args  := new(Args);
+	args.Key   = key;
+	args.Value = value;
+	err := c.client.Call("Server.Set", args, reply);
+	return reply.Value, err;
+}
