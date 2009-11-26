@@ -2,6 +2,7 @@ package kvs
 
 import (
 	"testing";
+	"fmt";
 )
 var tested int = 1;
 
@@ -36,7 +37,7 @@ func TestServerStandalone (t *testing.T) {
 
 	args, reply = prepare("bar", "");
 	server.Get(args, reply);
-	ok(t, reply.Value == "", "get bar == ''");
+	ok(t, reply.Value == "", "get bar == \"\"");
 
 	args, reply = prepare("bar", "baz");
 	server.Set(args, reply);
@@ -54,3 +55,31 @@ func TestServerStandalone (t *testing.T) {
 	server.Get(args, reply);
 	ok(t, reply.Value == "BAZ", "get bar == BAZ");
 }
+
+func TestServerClient (t *testing.T) {
+	go func() {
+		RunServer("localhost:1975");
+	}();
+
+	client, err := NewClient("localhost:1975");
+	ok(t, err == nil, "NewClient()");
+
+	var value string;
+	value, err = client.Get("xxx");
+	ok(t, err == nil, "");
+	ok(t, value == "", "client.Get(xxx) == \"\"");
+	fmt.Printf("%s", "A");
+
+	for i := 0; i < 10; i++ {
+		key := fmt.Sprintf("key_%d", i);
+		val := fmt.Sprintf("val_%d", i);
+
+		_, err = client.Set(key, val);
+		ok(t, err == nil, fmt.Sprintf("client.Set(%s,%s)", key, val));
+
+		value, err = client.Get(key);
+		ok(t, err == nil, "");
+		ok(t, value == val, fmt.Sprintf("client.Get(%s)", key));
+	}
+}
+
