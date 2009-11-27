@@ -12,8 +12,8 @@ func empty_port () int {
 	for port := 10000; port < 20000; port++ {
 		addr   := fmt.Sprintf("localhost:%d", port);
 		l, err := net.Listen("tcp", addr);
+		defer l.Close();
 		if (err == nil) {
-			l.Close();
 			return port;
 		}
 	}
