@@ -4,8 +4,21 @@ import (
 	"testing";
 	"fmt";
 	"time";
+	"net";
 )
 var tested int = 1;
+
+func empty_port () int {
+	for port := 10000; port < 20000; port++ {
+		addr   := fmt.Sprintf("localhost:%d", port);
+		l, err := net.Listen("tcp", addr);
+		if (err == nil) {
+			l.Close();
+			return port;
+		}
+	}
+	panic("can't listen empty port");
+}
 
 func ok(t *testing.T, ok bool, name string) {
 	if !ok {
@@ -58,11 +71,15 @@ func TestServerStandalone (t *testing.T) {
 }
 
 func TestServerClient (t *testing.T) {
-	go RunServer("localhost:1975");
+	port := empty_port();
+	ok(t, port != 0, "empty_port");
+
+	addr := fmt.Sprintf("localhost:%d", port);
+	go RunServer(addr);
 
 	time.Sleep(int64(1) * 1e8); // wait for Server started
 
-	client, err := NewClient("localhost:1975");
+	client, err := NewClient(addr);
 	ok(t, err == nil, "NewClient()");
 
 	var value string;
