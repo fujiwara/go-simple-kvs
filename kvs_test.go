@@ -5,6 +5,7 @@ import (
 	"fmt";
 	"time";
 	"net";
+	"log";
 )
 var tested int = 1;
 
@@ -12,8 +13,8 @@ func empty_port () int {
 	for port := 10000; port < 20000; port++ {
 		addr   := fmt.Sprintf("localhost:%d", port);
 		l, err := net.Listen("tcp", addr);
-		defer l.Close();
 		if (err == nil) {
+			defer l.Close();
 			return port;
 		}
 	}
@@ -73,6 +74,7 @@ func TestServerStandalone (t *testing.T) {
 func TestServerClient (t *testing.T) {
 	port := empty_port();
 	ok(t, port != 0, "empty_port");
+	log.Stderrf("got empty port: %d", port);
 
 	addr := fmt.Sprintf("localhost:%d", port);
 	go RunServer(addr);
